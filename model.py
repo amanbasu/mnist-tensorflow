@@ -8,7 +8,7 @@ import os
 dropout = 0.8
 n_classes = 10
 batch_size = 128
-hm_epochs = 5
+hm_epochs = 1000
 learning_rate = 0.0015
 
 # defining variables
@@ -44,7 +44,7 @@ def maxpool2d(x):
     return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
 def cnn_model(x):
-	# initializing weights
+    # initializing weights
     weights = {'W_conv1':tf.Variable(tf.random_normal([5,5,1,32])),
                'W_conv2':tf.Variable(tf.random_normal([5,5,32,64])),
                'W_fc':tf.Variable(tf.random_normal([7*7*64,128])),
@@ -83,7 +83,7 @@ def cnn_model(x):
     return output
 
 def train_model(x):
-	# getting output after feed forward
+    # getting output after feed forward
     prediction = cnn_model(x)
 
     # calculating cross entropy loss
