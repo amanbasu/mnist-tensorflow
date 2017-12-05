@@ -11,7 +11,7 @@ n_classes = 10
 x = tf.placeholder('float',[None,28,28,1], name='x')
 
 # returns the training data after formatting
-def get_data(index=1):
+def get_data():
     df_test = pd.read_csv('test.csv')
 
     X_test = df_test.values.reshape(-1,784)
@@ -19,14 +19,7 @@ def get_data(index=1):
     X_test = X_test.astype('float32')
     X_test /= 255
 
-    if index==1:
-        return X_test[0:7000]
-    if index==2:
-        return X_test[7000:14000]
-    if index==3:
-        return X_test[14000:21000]
-    if index==4:
-        return X_test[21000:28000]
+    return X_test[0:7000]
 
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding='SAME')
@@ -35,7 +28,8 @@ def maxpool2d(x):
     return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
 def cnn_model(x):
-	# initializing weights
+	
+    # initializing weights
     weights = {'W_conv1':tf.Variable(tf.random_normal([5,5,1,32])),
                'W_conv2':tf.Variable(tf.random_normal([5,5,32,64])),
                'W_fc':tf.Variable(tf.random_normal([7*7*64,128])),
@@ -74,7 +68,8 @@ def cnn_model(x):
     return output
 
 def train_model(x):
-	# getting output after feed forward
+	
+    # getting output after feed forward
     prediction = cnn_model(x)
 
     # defining session
@@ -92,30 +87,15 @@ def train_model(x):
         os.chdir(pwd)
 
         out = tf.argmax(prediction,1)
-
+	
         # getting data
-        X_test = get_data(1)
+        X_test = get_data()
         pred = out.eval({x: X_test})
+	
         # creating Series to store predictions
-        ser = pd.Series(pred, index=range(1,7001))
-        print('1st set completed')
-
-        X_test = get_data(2)
-        pred = out.eval({x: X_test})
-        ser = ser.append(pd.Series(pred, index=range(7001,14001)))
-        print('2nd set completed')
-
-        X_test = get_data(3)
-        pred = out.eval({x: X_test})
-        ser = ser.append(pd.Series(pred, index=range(14001,21001)))
-        print('3rd set completed')
-
-        X_test = get_data(4)
-        pred = out.eval({x: X_test})
-        ser = ser.append(pd.Series(pred, index=range(21001,28001)))
-        print('4th set completed')
-
+        ser = pd.Series(pred)
+	
         # saving predictions
         ser.to_csv('output.csv')
-        print('File saved')
+
 train_model(x)
